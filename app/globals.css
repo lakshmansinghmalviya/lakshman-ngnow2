@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 270 75% 47%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 190 100% 42%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 24 100% 57%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 270 75% 47%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  .font-kolka {
+    font-family: var(--font-kolka), "Poppins", "Helvetica", "Arial", sans-serif;
+  }
+}
+
+@layer components {
+  .gradient-heading {
+    @apply bg-gradient-to-r from-purple-light via-primary to-purple-dark bg-clip-text text-transparent;
+  }
+
+  .gradient-text-primary {
+    @apply bg-gradient-to-r from-primary to-purple-dark bg-clip-text text-transparent;
+  }
+
+  .gradient-text-secondary {
+    @apply bg-gradient-to-r from-teal to-blue bg-clip-text text-transparent;
+  }
+
+  .gradient-text-accent {
+    @apply bg-gradient-to-r from-orange to-pink bg-clip-text text-transparent;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  .nav-item {
+    @apply relative px-3 py-2 text-sm font-medium transition-colors;
+  }
+
+  .nav-item-active {
+    @apply text-primary after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-primary after:content-[''];
+  }
+
+  .nav-item-inactive {
+    @apply text-muted-foreground hover:text-primary;
+  }
+
+  .section-padding {
+    @apply py-12 md:py-20;
+  }
+
+  .feature-card {
+    @apply relative overflow-hidden rounded-xl border bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1;
+  }
+
+  .feature-icon {
+    @apply mb-4 rounded-lg bg-primary/10 p-3 text-primary;
+  }
+
+  .gradient-border {
+    @apply relative before:absolute before:-inset-[1px] before:rounded-[inherit] before:bg-gradient-to-r before:from-primary before:to-secondary before:content-[''];
+  }
+
+  /* New enhanced components */
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-lg;
+  }
+
+  .glass-nav {
+    @apply bg-white/80 backdrop-blur-md border-b border-white/20;
+  }
+
+  .glass-button {
+    @apply bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/30 transition-all;
+  }
+
+  .shimmer {
+    @apply relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-shimmer before:bg-gradient-shine;
+  }
+
+  .blob-animation {
+    @apply animate-morph-blob;
+  }
+
+  .gradient-button {
+    @apply relative overflow-hidden bg-gradient-to-r from-primary to-purple-dark hover:from-purple-dark hover:to-primary transition-all duration-300;
+  }
+
+  .gradient-button-secondary {
+    @apply relative overflow-hidden bg-gradient-to-r from-teal to-blue hover:from-blue hover:to-teal transition-all duration-300;
+  }
+
+  .gradient-button-accent {
+    @apply relative overflow-hidden bg-gradient-to-r from-orange to-pink hover:from-pink hover:to-orange transition-all duration-300;
+  }
+
+  .nav-glassmorphism {
+    @apply bg-white/70 backdrop-blur-md border-b border-white/20 shadow-sm;
+  }
+
+  .nav-pill {
+    @apply rounded-full px-4 py-2 text-sm font-medium transition-all duration-300;
+  }
+
+  .nav-pill-active {
+    @apply bg-primary text-white shadow-md;
+  }
+
+  .nav-pill-inactive {
+    @apply text-foreground hover:bg-primary/10;
+  }
+
+  .floating-card {
+    @apply animate-float shadow-xl;
+  }
+
+  .glow-on-hover {
+    @apply hover:shadow-neon transition-shadow duration-300;
+  }
+
+  .glow-on-hover-secondary {
+    @apply hover:shadow-neon-secondary transition-shadow duration-300;
+  }
+
+  .glow-on-hover-accent {
+    @apply hover:shadow-neon-accent transition-shadow duration-300;
+  }
+}
