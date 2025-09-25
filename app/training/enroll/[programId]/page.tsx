@@ -17,11 +17,9 @@ import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
 import { courses } from "@/app/courses/page"
-import { v4 as uuidv4 } from "uuid"; // or generate IDs another way
-
 function mapCourseToProgram(course: any): TrainingProgram {
   return {
-    id: uuidv4(),
+    id: course.id,
     title: course.title,
     duration: "8 weeks", // 🔹 put your default/real duration
     price: course.isFree ? 0 : parseInt(course.price?.replace(/[₹,]/g, "") || "0"),
@@ -208,7 +206,7 @@ export default function EnrollmentPage() {
 
           // Redirect to a success page or back to training
           setTimeout(() => {
-            router.push("/training/payment/"+searchParam.get("id"))
+            router.push("/training/payment/" + searchParam.get("id"))
           }, 2000)
         } else {
           toast({
