@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, CheckCircle, CreditCard, User, Loader2, Gift } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,6 +16,28 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
+import { courses } from "@/app/courses/page"
+import { v4 as uuidv4 } from "uuid"; // or generate IDs another way
+
+function mapCourseToProgram(course: any): TrainingProgram {
+  return {
+    id: uuidv4(),
+    title: course.title,
+    duration: "8 weeks", // 🔹 put your default/real duration
+    price: course.isFree ? 0 : parseInt(course.price?.replace(/[₹,]/g, "") || "0"),
+    originalPrice: course.isFree ? 0 : parseInt(course.price?.replace(/[₹,]/g, "") || "0"),
+    features: [
+      "Lifetime access",
+      "Certificate of completion",
+      "Access to course materials",
+    ],
+    highlights: [
+      course.description,
+      `Category: ${course.category}`,
+      course.isNew ? "Brand new course!" : "Popular course",
+    ],
+  };
+}
 
 interface TrainingProgram {
   id: string
@@ -30,6 +52,7 @@ interface TrainingProgram {
 export default function EnrollmentPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParam = useSearchParams();
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const [programLoading, setProgramLoading] = useState(true)
@@ -54,7 +77,17 @@ export default function EnrollmentPage() {
   })
 
   useEffect(() => {
-    fetchProgram()
+    const source = searchParam.get("source");
+    if (source) {
+      const foundCourse = courses.find((c) => c.id == Number(searchParam.get("id") ?? 0));
+      if (foundCourse) {
+        setProgram(mapCourseToProgram(foundCourse));
+        setProgramLoading(false)
+      }
+    }
+    else {
+      fetchProgram()
+    }
   }, [params.programId])
 
   const fetchProgram = async () => {
@@ -151,54 +184,96 @@ export default function EnrollmentPage() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent,) => {
     e.preventDefault()
-    setIsLoading(true)
-
-    try {
-      const enrollmentData = {
-        ...formData,
-        programId: params.programId as string,
-        referralCodeValid: referralCodeValid,
-      }
-
-      const response = await fetch("/api/enrollments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(enrollmentData),
-      })
-
-      const result = await response.json()
-
-      if (result.success) {
-        toast({
-          title: "Enrollment Successful!",
-          description:
-            "Your enrollment has been submitted successfully. You will receive a confirmation email shortly.",
+    if (searchParam.get("source")) {
+      setIsLoading(true)
+      try {
+        const response = await fetch("/api/courses", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
         })
 
-        // Redirect to a success page or back to training
-        setTimeout(() => {
-          router.push("/training")
-        }, 2000)
-      } else {
+        const result = await response.json()
+
+        if (result.success) {
+          toast({
+            title: "Enrollment Successful!",
+            description:
+              "Your enrollment has been submitted successfully. You will receive a confirmation email shortly.",
+          })
+
+          // Redirect to a success page or back to training
+          setTimeout(() => {
+            router.push("/training/payment/"+searchParam.get("id"))
+          }, 2000)
+        } else {
+          toast({
+            title: "Enrollment Failed",
+            description: result.error || "Failed to submit enrollment",
+            variant: "destructive",
+          })
+        }
+      } catch (error) {
+        console.error("Enrollment error:", error)
         toast({
-          title: "Enrollment Failed",
-          description: result.error || "Failed to submit enrollment",
+          title: "Error",
+          description: "An unexpected error occurred. Please try again.",
           variant: "destructive",
         })
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error) {
-      console.error("Enrollment error:", error)
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
+    } else {
+      setIsLoading(true)
+      try {
+        const enrollmentData = {
+          ...formData,
+          programId: params.programId as string,
+          referralCodeValid: referralCodeValid,
+        }
+
+        const response = await fetch("/api/enrollments", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(enrollmentData),
+        })
+
+        const result = await response.json()
+
+        if (result.success) {
+          toast({
+            title: "Enrollment Successful!",
+            description:
+              "Your enrollment has been submitted successfully. You will receive a confirmation email shortly.",
+          })
+
+          // Redirect to a success page or back to training
+          setTimeout(() => {
+            router.push("/training")
+          }, 2000)
+        } else {
+          toast({
+            title: "Enrollment Failed",
+            description: result.error || "Failed to submit enrollment",
+            variant: "destructive",
+          })
+        }
+      } catch (error) {
+        console.error("Enrollment error:", error)
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred. Please try again.",
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -255,14 +330,16 @@ export default function EnrollmentPage() {
       </div>
     )
   }
-
+  const handleBack = () => {
+    router.back();
+  }
   return (
     <div className="container py-8 max-w-6xl">
       {/* Header */}
       <div className="mb-8">
-        <Link href="/training" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Training Programs
+        <Link href="" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-4">
+          <ArrowLeft className="h-4 w-4 mr-2" onClick={handleBack} />
+          Back to {searchParam.get("source") ? "Course" : "Training"} Programs
         </Link>
         <h1 className="text-3xl font-bold">Enroll in {program.title}</h1>
         <p className="text-muted-foreground mt-2">Complete your enrollment to start your journey in {program.title}</p>
@@ -435,13 +512,12 @@ export default function EnrollmentPage() {
                         onChange={(e) => handleInputChange("referralCode", e.target.value.toUpperCase())}
                         onBlur={handleReferralCodeBlur}
                         placeholder="Enter your referral code"
-                        className={`pr-10 ${
-                          referralCodeValid === true
-                            ? "border-green-500 bg-green-50"
-                            : referralCodeValid === false
-                              ? "border-red-500 bg-red-50"
-                              : ""
-                        }`}
+                        className={`pr-10 ${referralCodeValid === true
+                          ? "border-green-500 bg-green-50"
+                          : referralCodeValid === false
+                            ? "border-red-500 bg-red-50"
+                            : ""
+                          }`}
                         disabled={checkingReferral}
                       />
                       {checkingReferral && (
