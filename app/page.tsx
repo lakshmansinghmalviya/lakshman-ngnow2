@@ -16,6 +16,7 @@ import {
   Lightbulb,
   MousePointer,
 } from "lucide-react"
+import Autoplay from "embla-carousel-autoplay"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
@@ -390,7 +391,7 @@ export default function Home() {
                   },
                 ].map((course, index) => (
                   <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
-                    <AnimatedElement animation="scale-in" delay={0.1 * index} className="p-1">
+                    <AnimatedElement animation="slide-right" delay={0.1 * index} className="p-1">
                       <Card className="glass-card overflow-hidden card-hover group">
                         <div
                           className={`h-1.5 w-full bg-gradient-to-r from-${course.color} to-${course.color}-light`}
@@ -472,7 +473,10 @@ export default function Home() {
             animation="fade-up"
             className="flex flex-col items-center justify-center space-y-4 text-center"
           >
-            <Badge variant="outline" className="bg-orange/10 border-orange text-orange px-4 py-1 mb-2 rounded-full">
+            <Badge
+              variant="outline"
+              className="bg-orange/10 border-orange text-orange px-4 py-1 mb-2 rounded-full"
+            >
               <Lightbulb className="h-3.5 w-3.5 mr-1.5 text-yellow animate-pulse-slow" />
               Testimonials
             </Badge>
@@ -485,15 +489,27 @@ export default function Home() {
               />
               <AnimatedElement animation="fade-up" delay={0.3}>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl">
-                  See what our students have to say about their learning experience.
+                  See what our students have to say about their learning
+                  experience.
                 </p>
               </AnimatedElement>
             </div>
           </AnimatedElement>
 
+          {/* ✅ Carousel with autoplay + pause on hover */}
           <div className="mx-auto py-8">
-            <Carousel className="w-full max-w-5xl mx-auto">
-              <CarouselContent>
+            <Carousel
+              className="w-full max-w-5xl mx-auto group"
+              opts={{ loop: true }}
+              plugins={[
+                Autoplay({
+                  delay: 3000,
+                  stopOnInteraction: false, // keeps running after interaction
+                  stopOnMouseEnter: true, // ✅ pause on hover
+                }),
+              ]}
+            >
+              <CarouselContent className="transition-transform duration-700 ease-linear">
                 {[
                   {
                     name: "Sonam Yadav",
@@ -521,7 +537,11 @@ export default function Home() {
                   },
                 ].map((testimonial, index) => (
                   <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/1">
-                    <AnimatedElement animation="scale-in" delay={0.1 * index} className="p-1">
+                    <AnimatedElement
+                      animation="slide-right"
+                      delay={0.1 * index}
+                      className="p-1"
+                    >
                       <Card className="glass-card h-full card-hover relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange/10 to-pink/10 rounded-bl-full -z-10 blob-animation"></div>
                         <CardContent className="p-6 flex flex-col items-center text-center">
@@ -539,16 +559,23 @@ export default function Home() {
                             {Array.from({ length: 5 }).map((_, i) => (
                               <Star
                                 key={i}
-                                className={`h-4 w-4 ${
-                                  i < testimonial.rating ? "text-yellow fill-yellow" : "text-gray-300"
-                                }`}
+                                className={`h-4 w-4 ${i < testimonial.rating
+                                    ? "text-yellow fill-yellow"
+                                    : "text-gray-300"
+                                  }`}
                               />
                             ))}
                           </div>
-                          <p className="mb-4 text-muted-foreground italic">"{testimonial.review}"</p>
+                          <p className="mb-4 text-muted-foreground italic">
+                            "{testimonial.review}"
+                          </p>
                           <div>
-                            <h4 className="font-semibold gradient-text-accent">{testimonial.name}</h4>
-                            <p className="text-sm text-muted-foreground">{testimonial.college}</p>
+                            <h4 className="font-semibold gradient-text-accent">
+                              {testimonial.name}
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                              {testimonial.college}
+                            </p>
                           </div>
                         </CardContent>
                       </Card>
@@ -556,6 +583,8 @@ export default function Home() {
                   </CarouselItem>
                 ))}
               </CarouselContent>
+
+              {/* Navigation Buttons */}
               <div className="flex justify-center mt-4">
                 <CarouselPrevious className="relative mr-2 bg-white/80 backdrop-blur-sm border border-white/30" />
                 <CarouselNext className="relative ml-2 bg-white/80 backdrop-blur-sm border border-white/30" />
@@ -564,6 +593,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+
 
       {/* CTA Section */}
       <section className="section-padding relative overflow-hidden">
