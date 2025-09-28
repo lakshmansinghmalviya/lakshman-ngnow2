@@ -20,14 +20,29 @@ export default function Footer() {
     if (!email) return
 
     setIsSubmitting(true)
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false)
-      setIsSubmitted(true)
-      setEmail("")
-      // Reset after 3 seconds
-      setTimeout(() => setIsSubmitted(false), 3000)
-    }, 1000)
+    
+    // Send newsletter subscription to care@enginow.in
+    fetch("/api/newsletter", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        setIsSubmitting(false)
+        if (result.success) {
+          setIsSubmitted(true)
+          setEmail("")
+          // Reset after 3 seconds
+          setTimeout(() => setIsSubmitted(false), 3000)
+        }
+      })
+      .catch((error) => {
+        console.error("Newsletter subscription error:", error)
+        setIsSubmitting(false)
+      })
   }
 
   return (
@@ -300,6 +315,7 @@ export default function Footer() {
                 { name: "Privacy Policy", href: "/privacy" },
                 { name: "Terms of Service", href: "/terms" },
                 { name: "Cookie Policy", href: "/cookies" },
+                { name: "Refund Policy", href: "/refund" },
               ].map((link, i) => (
                 <motion.div key={i} whileHover={{ y: -2 }} transition={{ type: "spring", stiffness: 300 }}>
                   <Link href={link.href} className="text-xs text-muted-foreground hover:text-primary transition-colors">
