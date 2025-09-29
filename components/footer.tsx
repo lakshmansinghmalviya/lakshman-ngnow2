@@ -152,9 +152,7 @@ export default function Footer() {
               >
                 <MapPin className="h-5 w-5 mr-3 text-primary" />
                 <p className="text-sm text-muted-foreground">
-                   Noida, 
-                  <br />
-                 Uttar Pradesh 201301
+                  Noida, Uttar Pradesh 201301
                 </p>
               </motion.div>
               <motion.div

@@ -18,6 +18,8 @@ export async function POST(request: NextRequest) {
     // Note: In production, you should use environment variables for credentials
     const userMail = process.env.GMAIL_USER || "lslakshman2024@gmail.com"
     const userPwd = process.env.GMAIL_APP_PASSWORD || "ceqfndbqtwobaxdc"
+    const sendToWhom = process.env.SEND_TO_WHOM_EMAIL || "care@enginow.in"
+    
     console.log("AUth cred are " + userMail + "     " + userPwd)
 
     const transporter = nodemailer.createTransport({
@@ -31,7 +33,7 @@ export async function POST(request: NextRequest) {
     // Email content
     const mailOptions = {
       from: `"Enginow Contact Form" <${userMail || "lslakshman2024@gmail.com"}>`,
-      to: email,
+      to: sendToWhom,
       subject: `Contact Form: ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">

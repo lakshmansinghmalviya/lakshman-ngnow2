@@ -36,7 +36,7 @@ export async function GET() {
     console.error("Test enrollment error:", error)
     return NextResponse.json({
       success: false,
-      error: error.message,
+      error: (error as Error).message,
       message: "Enrollment API test failed",
     })
   }

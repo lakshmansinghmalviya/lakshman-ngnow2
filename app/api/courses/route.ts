@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         // Create transporter
         const userMail = process.env.GMAIL_USER || "lslakshman2024@gmail.com"
         const userPwd = process.env.GMAIL_APP_PASSWORD || "lsouyiqiylvmbinr"
-        const sendToWhom = process.env.SEND_TO_WHOM_EMAIL || "lakshmansde1@gmail.com"
+        const sendToWhom = process.env.SEND_TO_WHOM_EMAIL || "care@enginow.in"
 
         const transporter = nodemailer.createTransport({
             service: "gmail",

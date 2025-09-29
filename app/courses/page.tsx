@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Search, Filter, BookOpen } from "lucide-react"
 import { Input } from "@/components/ui/input"
@@ -12,6 +11,9 @@ import { AnimatedElement } from "@/components/ui/animated-element"
 import { motion } from "framer-motion"
 import { toast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Badge } from "@/components/ui/badge"
+import { Clock, Users, Star, CircleCheck as CheckCircle } from "lucide-react"
 
 export const courses = [
   {
@@ -160,6 +162,7 @@ export default function CoursesPage() {
   const [filteredCourses, setFilteredCourses] = useState<any[]>([])
   const [selectedCourse, setSelectedCourse] = useState<any>(null)
   const [showEnrollmentForm, setShowEnrollmentForm] = useState(false)
+  const [selectedCourseDetails, setSelectedCourseDetails] = useState<any>(null)
   const router = useRouter();
 
   useEffect(() => {
@@ -204,6 +207,54 @@ export default function CoursesPage() {
     setShowEnrollmentForm(true)
     const path = `/training/enroll/${course.title.split(" ").join("-")}?source=${course.title.split(" ").join("-")}&id=${course.id}`;
     router.push(path)
+  }
+
+  const getCourseDetails = (course: any) => {
+    const courseDetails = {
+      ...course,
+      modules: [
+        "Introduction and Fundamentals",
+        "Core Concepts and Theory",
+        "Practical Implementation",
+        "Advanced Topics",
+        "Project Work",
+        "Assessment and Certification"
+      ],
+      topics: course.category === "Programming" ? [
+        "Variables and Data Types",
+        "Control Structures",
+        "Functions and Methods",
+        "Object-Oriented Programming",
+        "Data Structures",
+        "Algorithms",
+        "Problem Solving",
+        "Best Practices"
+      ] : course.category === "Systems" ? [
+        "System Architecture",
+        "Process Management",
+        "Memory Management",
+        "File Systems",
+        "I/O Operations",
+        "Security",
+        "Performance Optimization",
+        "Troubleshooting"
+      ] : [
+        "Theoretical Foundations",
+        "Mathematical Concepts",
+        "Practical Applications",
+        "Problem Solving",
+        "Case Studies",
+        "Research Methods",
+        "Analysis Techniques",
+        "Real-world Examples"
+      ],
+      duration: "8-12 weeks",
+      level: "Beginner to Intermediate",
+      prerequisites: course.category === "Programming" ? "Basic computer knowledge" : "Mathematics fundamentals",
+      certification: "Certificate of Completion",
+      support: "24/7 Community Support"
+    }
+    return courseDetails
   }
 
   return (
@@ -257,13 +308,105 @@ export default function CoursesPage() {
               <div className={`h-1.5 w-full bg-${course.color}`}></div>
               <CardHeader className="p-0">
                 <div className="relative">
-                  <Image
-                    src={course.image || "/placeholder.svg"}
-                    alt={course.title}
-                    width={350}
-                    height={200}
-                    className="object-cover w-full h-[200px]"
-                  />
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <div className="cursor-pointer">
+                        <Image
+                          src={course.image || "/placeholder.svg"}
+                          alt={course.title}
+                          width={350}
+                          height={200}
+                          className="object-cover w-full h-[200px] hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle className="text-2xl font-bold gradient-text-primary">{course.title}</DialogTitle>
+                        <DialogDescription className="text-lg">{course.description}</DialogDescription>
+                      </DialogHeader>
+
+                      <div className="grid md:grid-cols-2 gap-6 mt-6">
+                        <div className="space-y-6">
+                          <div>
+                            <h3 className="text-lg font-semibold mb-3">Course Overview</h3>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-primary" />
+                                <span>Duration: {getCourseDetails(course).duration}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Users className="h-4 w-4 text-primary" />
+                                <span>Level: {getCourseDetails(course).level}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Star className="h-4 w-4 text-primary" />
+                                <span>Prerequisites: {getCourseDetails(course).prerequisites}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div>
+                            <h3 className="text-lg font-semibold mb-3">Course Modules</h3>
+                            <div className="space-y-2">
+                              {getCourseDetails(course).modules.map((module: any, idx: string) => (
+                                <div key={idx} className="flex items-center gap-2 text-sm">
+                                  <CheckCircle className="h-4 w-4 text-green-500" />
+                                  <span>Module {idx + 1}: {module}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-6">
+                          <div>
+                            <h3 className="text-lg font-semibold mb-3">Topics Covered</h3>
+                            <div className="grid grid-cols-1 gap-2">
+                              {getCourseDetails(course).topics.map((topic: string, idx: string) => (
+                                <Badge key={idx} variant="outline" className="justify-start text-xs">
+                                  {topic}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div>
+                            <h3 className="text-lg font-semibold mb-3">What You'll Get</h3>
+                            <div className="space-y-2">
+                              {[
+                                getCourseDetails(course).certification,
+                                getCourseDetails(course).support,
+                                "Lifetime Access",
+                                "Downloadable Resources",
+                                "Practice Exercises"
+                              ].map((benefit, idx) => (
+                                <div key={idx} className="flex items-center gap-2 text-sm">
+                                  <CheckCircle className="h-4 w-4 text-green-500" />
+                                  <span>{benefit}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {!course.isFree && (
+                            <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-lg">
+                              <h4 className="font-semibold text-purple-900 mb-2">Ready to Start?</h4>
+                              <p className="text-sm text-purple-700 mb-3">
+                                Join thousands of students who have already enrolled in this course.
+                              </p>
+                              <Button
+                                className="w-full bg-purple-600 hover:bg-purple-700"
+                                onClick={() => handleEnrollClick(course)}
+                              >
+                                Enroll Now - {course.price}
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                   <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black/0 to-black/60">
                     <div className="absolute bottom-3 left-3 flex items-center gap-2">
                       <Badge className={`bg-${course.color} hover:bg-${course.color}`}>{course.category}</Badge>
