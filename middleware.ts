@@ -1,13 +1,13 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+// import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isProtectedRoute = createRouteMatcher(["/user(.*)", "/admin(.*)"]);
+// const isProtectedRoute = createRouteMatcher(["/user(.*)", "/admin(.*)"]);
 
-export default clerkMiddleware((auth, req) => {
-  if (isProtectedRoute(req)) {
-    auth().protect(); // 🔒 Enforces authentication
-  }
-});
+// export default clerkMiddleware((auth, req) => {
+//   if (isProtectedRoute(req)) {
+//     auth().protect(); // 🔒 Enforces authentication
+//   }
+// });
 
-export const config = {
-  matcher: ["/((?!_next|.*\\..*).*)"], // Run for all routes except static files
-};
+// export const config = {
+//   matcher: ["/((?!_next|.*\\..*).*)"], // Run for all routes except static files
+// };
