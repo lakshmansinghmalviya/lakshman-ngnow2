@@ -197,7 +197,7 @@ export default function Navbar() {
               <Button size="sm" className="gradient-button text-white rounded-full px-6 shadow-md" asChild>
                 <Link href="/sign-in" className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4" />
-                  Sign In
+                  Get Started
                 </Link>
               </Button>
             </motion.div>
