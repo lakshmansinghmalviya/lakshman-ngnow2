@@ -1,5 +1,5 @@
 "use client"
-import { useParams, useSearchParams } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, CreditCard, Shield, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,6 +9,7 @@ import Link from "next/link"
 
 export default function PaymentPage() {
   const params = useParams()
+  const router = useRouter()
   const searchParams = useSearchParams()
   const enrollmentId = searchParams.get("enrollmentId")
 
@@ -21,8 +22,83 @@ export default function PaymentPage() {
   }
 
   const handlePayment = async () => {
-    // Here you would integrate with Razorpay or other payment gateway
-    alert("Payment integration would be implemented here with Razorpay/Stripe")
+    // Create order on server
+    const amount = program.price
+    const res = await fetch("/api/payments/order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount, currency: "INR", receipt: `enroll_${enrollmentId || Date.now()}` }),
+    })
+    const data = await res.json()
+    if (!data.success) {
+      alert(data.error || "Unable to start payment")
+      return
+    }
+
+    const order = data.order
+    const key = data.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_mock"
+
+    // If running mock (no keys), simulate success
+    if (data.mock) {
+      await fetch("/api/payments/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          razorpay_payment_id: `pay_mock_${Date.now()}`,
+          razorpay_order_id: order.id,
+          razorpay_signature: "mock",
+          enrollmentId,
+          programId: params.programId,
+          userEmail: "user@example.com",
+          amount,
+        }),
+      })
+      alert("You have successfully enrolled in " + program.title)
+      router.push(`/training?success=1&program=${encodeURIComponent(program.title)}`)
+      return
+    }
+
+    const options: any = {
+      key,
+      amount: order.amount,
+      currency: order.currency,
+      name: "Enginow",
+      description: program.title,
+      order_id: order.id,
+      handler: async function (response: any) {
+        const verifyRes = await fetch("/api/payments/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            enrollmentId,
+            programId: params.programId,
+            userEmail: "user@example.com",
+            amount,
+          }),
+        })
+        const verifyData = await verifyRes.json()
+        if (verifyData.success) {
+          alert("You have successfully enrolled in " + program.title)
+          router.push(`/training?success=1&program=${encodeURIComponent(program.title)}`)
+        } else {
+          alert("Payment verification failed")
+        }
+      },
+      theme: { color: "#9A2FC4" },
+    }
+
+    // Load Razorpay script dynamically
+    const script = document.createElement("script")
+    script.src = "https://checkout.razorpay.com/v1/checkout.js"
+    script.onload = () => {
+      const rzp = new (window as any).Razorpay(options)
+      rzp.open()
+    }
+    script.onerror = () => alert("Failed to load payment SDK")
+    document.body.appendChild(script)
   }
 
   return (

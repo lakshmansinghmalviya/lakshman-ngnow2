@@ -10,6 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
 
 const routes = [
   { name: "Home", path: "/" },
@@ -33,6 +34,8 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isNavigating, setIsNavigating] = useState(false)
   const pathname = usePathname()
   const [isMounted, setIsMounted] = useState(false)
 
@@ -175,14 +178,30 @@ export default function Navbar() {
             <span className="sr-only">Search</span>
           </Button>
 
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button size="sm" className="gradient-button text-white rounded-full px-6 shadow-md">
-              <Link href="/contact" className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4" />
-                Get Started
-              </Link>
-            </Button>
-          </motion.div>
+          <SignedIn>
+            <UserButton
+              afterSignOutUrl="/"
+              appearance={{
+                elements: {
+                  userButtonAvatarBox: "h-8 w-8",
+                  // Hide account delete controls in profile modal
+                  dangerSection: "hidden",
+                  dangerSection__deleteAccount: "hidden",
+                },
+              }}
+              userProfileMode="modal"
+            />
+          </SignedIn>
+          <SignedOut>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button size="sm" className="gradient-button text-white rounded-full px-6 shadow-md" asChild>
+                <Link href="/sign-in" className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  Get Started
+                </Link>
+              </Button>
+            </motion.div>
+          </SignedOut>
         </motion.div>
 
         {/* Mobile Navigation */}
@@ -333,6 +352,14 @@ export default function Navbar() {
                   type="search"
                   placeholder="Search courses, topics, or keywords..."
                   className="w-full bg-white/50 border border-white/30 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && searchQuery.trim() && !isNavigating) {
+                      setIsNavigating(true)
+                      window.location.href = `/courses?search=${encodeURIComponent(searchQuery.trim())}`
+                    }
+                  }}
                 />
                 <Button
                   variant="ghost"
