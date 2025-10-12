@@ -17,6 +17,8 @@ import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
 import { courses } from "@/app/courses/page"
+import { getTrainingPrograms } from "@/app/api/training/programs/route"
+
 function mapCourseToProgram(course: any): TrainingProgram {
   return {
     id: course.id,

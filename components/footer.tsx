@@ -47,11 +47,11 @@ export default function Footer() {
 
   return (
     <footer className="w-full bg-gradient-mesh border-t border-white/20">
-      <div className="container py-12 md:py-16">
+      <div className="container py-10 md:py-12">
         {/* Newsletter Section */}
         <AnimatedElement
           animation="fade-up"
-          className="mb-16 p-6 md:p-8 glass-card rounded-2xl border border-white/20 shadow-lg"
+          className="mb-10 p-6 md:p-8 glass-card rounded-2xl border border-white/20 shadow-lg"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div>
@@ -125,7 +125,7 @@ export default function Footer() {
           </div>
         </AnimatedElement>
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-6 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-6 lg:grid-cols-12">
           <AnimatedElement animation="fade-right" delay={0.1} className="md:col-span-2 lg:col-span-4">
             <div className="flex items-center mb-4">
               <div className="bg-white rounded-full p-1.5 shadow-sm">
@@ -143,7 +143,7 @@ export default function Footer() {
               subjects.
             </p>
 
-            <div className="space-y-3 mb-6">
+            <div className="space-y-3 mb-4">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -303,7 +303,7 @@ export default function Footer() {
           <AnimatedElement
             animation="fade-up"
             delay={0.6}
-            className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4"
+            className="mt-8 pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4"
           >
             <p className="text-xs text-muted-foreground">
               &copy; {new Date().getFullYear()} Enginow. All rights reserved.

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import nodemailer from "nodemailer"
+import connectDB from "@/lib/mongodb"
+import Applicant from "@/models/Applicant"
 
 export async function POST(request: NextRequest) {
     try {
@@ -101,6 +103,17 @@ export async function POST(request: NextRequest) {
                     content: resumeBuffer,
                 },
             ],
+        }
+
+        // Persist applicant in DB (without resume binary)
+        try {
+            await connectDB()
+            await Applicant.create({
+                ...applicationData,
+                resumeFileName: resume?.name,
+            })
+        } catch (dbErr) {
+            console.warn("⚠️ Applicant DB save failed (continuing with email):", dbErr)
         }
 
         // Send email

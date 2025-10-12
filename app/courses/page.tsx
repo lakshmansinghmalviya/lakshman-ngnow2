@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { AnimatedElement } from "@/components/ui/animated-element"
 import { motion } from "framer-motion"
 import { toast } from "@/hooks/use-toast"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Clock, Users, Star, CircleCheck as CheckCircle } from "lucide-react"
@@ -164,10 +164,20 @@ export default function CoursesPage() {
   const [showEnrollmentForm, setShowEnrollmentForm] = useState(false)
   const [selectedCourseDetails, setSelectedCourseDetails] = useState<any>(null)
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     filterCourses(activeTab, searchQuery)
   }, [activeTab, searchQuery])
+
+  useEffect(() => {
+    const qp = searchParams?.get("search") || ""
+    if (qp) {
+      setSearchQuery(qp)
+      setActiveTab("all")
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const filterCourses = (tab: string, query: string) => {
     let filtered = courses
@@ -442,8 +452,8 @@ export default function CoursesPage() {
                     className="border-primary text-primary hover:bg-primary/10"
                     asChild
                   >
-                    <a href={course.youtubeLink} target="_blank" rel="noopener noreferrer">
-                      Watch on YouTube
+                    <a href={`/courses/watch/${course.id}`}>
+                      Watch Now
                     </a>
                   </Button>
                 ) : (
@@ -453,7 +463,7 @@ export default function CoursesPage() {
                     >
                       Enroll Now
                     </Button>
-                    <Button size="sm" className="bg-gradient-to-r from-primary to-purple-dark hover:opacity-90">
+                    <Button size="sm" className="bg-gradient-to-r from-primary to-purple-dark hover:opacity-90" disabled>
                       Coming Soon
                     </Button>
                   </>

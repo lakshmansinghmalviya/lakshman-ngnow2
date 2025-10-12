@@ -36,7 +36,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative w-full py-20 md:py-28 lg:py-36 overflow-hidden bg-gradient-mesh">
+      <section className="relative w-full py-16 md:py-24 lg:py-32 overflow-hidden bg-gradient-mesh">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden">
           {isMounted && <ParticlesBackground particleCount={30} connectDistance={150} />}
@@ -429,8 +429,8 @@ export default function Home() {
                               className="border-primary text-primary hover:bg-primary/10 rounded-full"
                               asChild
                             >
-                              <a href={course.youtubeLink} target="_blank" rel="noopener noreferrer">
-                                Watch on YouTube
+                              <a href={`/courses/watch/${index + 1}`}>
+                                Watch Now
                               </a>
                             </Button>
                           ) : (

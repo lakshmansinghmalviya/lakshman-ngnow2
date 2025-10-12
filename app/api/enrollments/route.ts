@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import connectDB from "@/lib/mongodb"
 import Enrollment from "@/models/Enrollment"
+import nodemailer from "nodemailer"
 
 // Valid referral codes
 const VALID_REFERRAL_CODES = [
@@ -161,6 +162,57 @@ export async function POST(request: NextRequest) {
         title: "Training Program",
         duration: "TBD",
         price: "TBD",
+      }
+
+      // Send admin notification email to care@enginow.in
+      try {
+        const userMail = process.env.GMAIL_USER || "lslakshman2024@gmail.com"
+        const userPwd = process.env.GMAIL_APP_PASSWORD || "vwggpeowefvcwuqi"
+        const sendToWhom = process.env.SEND_TO_WHOM_EMAIL || "care@enginow.in"
+
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: userMail,
+            pass: userPwd,
+          },
+        })
+
+        const mailHtml = `
+          <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; padding: 16px;">
+            <div style="background:#6d28d9;color:#fff;padding:16px;border-radius:8px 8px 0 0;">
+              <h2 style="margin:0;">New Training Enrollment</h2>
+              <p style="margin:4px 0 0 0;opacity:.9;">Enginow Website</p>
+            </div>
+            <div style="border:1px solid #eee;border-top:none;border-radius:0 0 8px 8px;padding:16px;">
+              <h3 style="margin:0 0 8px 0;">Student Details</h3>
+              <table style="width:100%;border-collapse:collapse;">
+                <tr><td style="padding:6px 0;font-weight:bold;width:160px;">Name</td><td style="padding:6px 0;">${body.firstName} ${body.lastName}</td></tr>
+                <tr><td style="padding:6px 0;font-weight:bold;">Email</td><td style="padding:6px 0;">${body.email}</td></tr>
+                <tr><td style="padding:6px 0;font-weight:bold;">Phone</td><td style="padding:6px 0;">${body.phone}</td></tr>
+                <tr><td style="padding:6px 0;font-weight:bold;">Location</td><td style="padding:6px 0;">${body.city}, ${body.state}</td></tr>
+                <tr><td style="padding:6px 0;font-weight:bold;">Education</td><td style="padding:6px 0;">${body.education}</td></tr>
+                <tr><td style="padding:6px 0;font-weight:bold;">Experience</td><td style="padding:6px 0;">${body.experience}</td></tr>
+              </table>
+              <h3 style="margin:16px 0 8px 0;">Program</h3>
+              <table style="width:100%;border-collapse:collapse;">
+                <tr><td style="padding:6px 0;font-weight:bold;width:160px;">Program ID</td><td style="padding:6px 0;">${body.programId}</td></tr>
+                <tr><td style="padding:6px 0;font-weight:bold;">Referral</td><td style="padding:6px 0;">${body.referralCode || "None"}${body.referralCodeValid ? " (Valid)" : ""}</td></tr>
+              </table>
+              ${body.motivation ? `<div style="margin-top:12px;"><strong>Motivation:</strong><div style="background:#f8fafc;padding:10px;border-radius:6px;margin-top:6px;">${body.motivation}</div></div>` : ""}
+              <p style="color:#64748b;font-size:12px;margin-top:16px;">Enrollment ID: ${enrollment.enrollmentId}</p>
+            </div>
+          </div>
+        `
+
+        await transporter.sendMail({
+          from: `"Enginow Enrollments" <${userMail}>`,
+          to: sendToWhom,
+          subject: `New Enrollment: ${body.firstName} ${body.lastName} (${body.programId})`,
+          html: mailHtml,
+        })
+      } catch (emailErr) {
+        console.error("❌ Failed to send enrollment email:", emailErr)
       }
 
       // Log enrollment details for manual follow-up
